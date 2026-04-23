@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card glass-card p-4 text-center h-100 d-flex justify-content-center">
+            <h5 class="text-muted mb-2 fw-semibold">當月總收入</h5>
+            <h1 class="text-success fw-bold m-0">${{ "{:,}".format(total_income) }}</h1>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card glass-card p-4 text-center h-100 d-flex justify-content-center">
+            <h5 class="text-muted mb-2 fw-semibold">當月總支出</h5>
+            <h1 class="text-danger fw-bold m-0">${{ "{:,}".format(total_expense) }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="card glass-card p-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold m-0">收支紀錄明細</h4>
+    </div>
+    
+    {% if records %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3 border-0 rounded-start">日期</th>
+                    <th class="border-0">類型</th>
+                    <th class="border-0">分類</th>
+                    <th class="border-0">備註</th>
+                    <th class="text-end border-0">金額</th>
+                    <th class="text-center border-0 rounded-end">操作</th>
+                </tr>
+            </thead>
+            <tbody class="border-top-0">
+                {% for r in records %}
+                <tr>
+                    <td class="ps-3 fw-medium">{{ r.date }}</td>
+                    <td>
+                        {% if r.type == 'income' %}
+                            <span class="badge badge-income rounded-pill px-3 py-2 fw-medium">收入</span>
+                        {% else %}
+                            <span class="badge badge-expense rounded-pill px-3 py-2 fw-medium">支出</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.category }}</td>
+                    <td class="text-muted text-truncate" style="max-width: 150px;">{{ r.note }}</td>
+                    <td class="text-end fs-5 fw-bold {{ 'text-success' if r.type == 'income' else 'text-danger' }}">
+                        {{ '+' if r.type == 'income' else '-' }}${{ "{:,}".format(r.amount) }}
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ url_for('main.edit_record', id=r.id) }}" class="btn btn-sm btn-outline-secondary me-2 px-3 rounded-pill">編輯</a>
+                        <form action="{{ url_for('main.delete_record', id=r.id) }}" method="POST" class="d-inline" onsubmit="return confirm('確定要刪除這筆紀錄嗎？此動作無法復原。');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger px-3 rounded-pill">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="fs-1 mb-3">📭</div>
+        <h5 class="text-muted fw-normal">目前尚無任何收支紀錄</h5>
+        <a href="{{ url_for('main.add_record') }}" class="btn btn-primary-custom mt-3 px-4 py-2">開始記帳</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

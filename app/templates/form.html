@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-8">
+        <div class="card glass-card p-4 p-md-5">
+            <h3 class="mb-4 fw-bold text-center">
+                {{ '✏️ 編輯收支紀錄' if is_edit else '✨ 新增收支紀錄' }}
+            </h3>
+            
+            <form method="POST" action="{{ url_for('main.edit_record', id=record.id) if is_edit else url_for('main.add_record') }}">
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="type" class="form-label fw-semibold">收支類型 <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-lg" id="type" name="type" required>
+                            <option value="expense" {{ 'selected' if record and record.type == 'expense' else '' }}>支出</option>
+                            <option value="income" {{ 'selected' if record and record.type == 'income' else '' }}>收入</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="amount" class="form-label fw-semibold">金額 <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg shadow-sm rounded">
+                            <span class="input-group-text bg-white border-end-0 text-muted">$</span>
+                            <input type="number" class="form-control border-start-0 ps-0" id="amount" name="amount" 
+                                   value="{{ record.amount if record else '' }}" placeholder="0" required min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="date" class="form-label fw-semibold">日期 <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control form-control-lg shadow-sm" id="date" name="date" 
+                               value="{{ record.date if record else '' }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="category" class="form-label fw-semibold">分類 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg shadow-sm" id="category" name="category" 
+                               value="{{ record.category if record else '' }}" placeholder="例如：餐飲、交通、薪水" required>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label for="note" class="form-label fw-semibold">備註</label>
+                    <textarea class="form-control shadow-sm" id="note" name="note" rows="3" 
+                              placeholder="紀錄一下細節...">{{ record.note if record else '' }}</textarea>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-light btn-lg px-4 me-md-2 border shadow-sm">取消</a>
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 shadow-sm">
+                        {{ '儲存修改' if is_edit else '新增紀錄' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 若為新增模式，將日期預設為今日
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!{{ 'true' if is_edit else 'false' }}) {
+            const dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        }
+    });
+</script>
+{% endblock %}
